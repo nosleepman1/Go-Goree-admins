@@ -88,7 +88,20 @@ export function Btn({ label, icon: Icon, variant = "primary", onClick, loading, 
   );
 }
 
-export function Table({ cols, rows }: { cols: string[]; rows: (string | React.ReactNode)[][] }) {
+/**
+ * État vide — affiché quand l'API ne renvoie aucune donnée. On préfère un vide
+ * explicite à des chiffres de démonstration : un tableau de bord qui invente
+ * des valeurs est plus dangereux qu'un tableau de bord vide.
+ */
+export function EmptyState({ message = "Aucune donnée à afficher", className }: { message?: string; className?: string }) {
+  return (
+    <div className={cn("flex items-center justify-center py-10 text-sm text-slate-400 dark:text-slate-500", className)}>
+      {message}
+    </div>
+  );
+}
+
+export function Table({ cols, rows, emptyMessage }: { cols: string[]; rows: (string | React.ReactNode)[][]; emptyMessage?: string }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -100,6 +113,13 @@ export function Table({ cols, rows }: { cols: string[]; rows: (string | React.Re
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 && (
+            <tr>
+              <td colSpan={cols.length} className="py-10 text-center text-sm text-slate-400 dark:text-slate-500">
+                {emptyMessage ?? "Aucune donnée à afficher"}
+              </td>
+            </tr>
+          )}
           {rows.map((row, i) => (
             <tr key={i} className="border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50/60 dark:hover:bg-slate-700/30 transition-colors">
               {row.map((cell, j) => (
