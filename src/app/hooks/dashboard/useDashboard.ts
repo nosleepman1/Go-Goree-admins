@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { listVoyages } from "../../services/voyages/voyagesService";
+import { listVoyagesDuJour } from "../../services/voyages/voyagesService";
 import { listPaiements } from "../../services/paiements/paiementsService";
 import { getDashboardMetrics } from "../../services/analytics/analyticsService";
 
@@ -21,9 +21,11 @@ export interface DashboardData {
  * revient à laisser croire à un tableau de bord fonctionnel.
  */
 export function useDashboard() {
+  // La carte s'intitule « Voyages du jour » : on filtre côté API plutôt que
+  // d'afficher tous les voyages à venir sous ce titre.
   const voyagesQ = useQuery({
-    queryKey: ["voyages"],
-    queryFn: listVoyages,
+    queryKey: ["voyages", "today"],
+    queryFn: listVoyagesDuJour,
   });
 
   const transactionsQ = useQuery({

@@ -167,9 +167,10 @@ export default function DashboardPage() {
           emptyMessage="Aucun voyage pour aujourd'hui"
           cols={["ID", "Départ", "Arrivée", "Chaloupe", "Places", "Vendus", "Occupation", "Statut", "Recette"]}
           rows={voyages.map(v => [
-            <span className="font-mono text-xs text-slate-500">{v.id}</span>,
-            <span className="font-mono font-bold text-slate-900">{v.depart}</span>,
-            v.arrivee, v.chaloupe,
+            // UUID complet illisible dans une colonne : on montre le préfixe.
+            <span className="font-mono text-xs text-slate-500" title={v.id}>{String(v.id).slice(0, 8)}</span>,
+            <span className="font-mono font-bold text-slate-900">{v.heure_depart || "—"}</span>,
+            <span className="font-mono">{v.heure_arrivee || "—"}</span>, v.chaloupe,
             <span className="font-mono">{v.places}</span>,
             <span className="font-mono">{v.vendus}</span>,
             <OccBar val={v.vendus === 0 ? 0 : Math.round((v.vendus / v.places) * 100)} />,
