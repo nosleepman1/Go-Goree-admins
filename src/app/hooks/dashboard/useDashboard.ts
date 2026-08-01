@@ -1,14 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { listVoyages } from "../../services/voyages/voyagesService";
+import { listVoyagesDuJour } from "../../services/voyages/voyagesService";
 import { listPaiements } from "../../services/paiements/paiementsService";
 import { getDashboardMetrics } from "../../services/analytics/analyticsService";
-import {
-  ticketData as mockTicketData,
-  monthlyData as mockMonthlyData,
-  pieData as mockPieData,
-  voyages as mockVoyages,
-  transactions as mockTransactions,
-} from "../../data/mock/dashboard.mock";
 
 export interface DashboardData {
   ticketData: any;
@@ -19,19 +12,27 @@ export interface DashboardData {
   overview?: any;
 }
 
+/**
+ * Données du tableau de bord — 100 % issues de l'API.
+ *
+ * Aucun repli sur des données de démonstration : si une requête échoue, les
+ * séries restent vides et `isError` remonte pour que la page affiche l'état
+ * d'erreur. Afficher des chiffres inventés sous un bandeau d'avertissement
+ * revient à laisser croire à un tableau de bord fonctionnel.
+ */
 export function useDashboard() {
+  // La carte s'intitule « Voyages du jour » : on filtre côté API plutôt que
+  // d'afficher tous les voyages à venir sous ce titre.
   const voyagesQ = useQuery({
-    queryKey: ["voyages"],
-    queryFn: listVoyages,
-    placeholderData: mockVoyages,
+    queryKey: ["voyages", "today"],
+    queryFn: listVoyagesDuJour,
   });
-  
+
   const transactionsQ = useQuery({
     queryKey: ["paiements"],
     queryFn: listPaiements,
-    placeholderData: mockTransactions,
   });
-  
+
   const analyticsQ = useQuery({
     queryKey: ["dashboard", "analytics"],
     queryFn: getDashboardMetrics,
@@ -51,11 +52,11 @@ export function useDashboard() {
   const metrics = analyticsQ.data || {};
 
   const data: DashboardData = {
-    ticketData: metrics.weekly_distribution ?? mockTicketData,
-    monthlyData: metrics.monthly_data ?? mockMonthlyData,
-    pieData: metrics.visitor_categories ?? mockPieData,
-    voyages: voyagesQ.data ?? mockVoyages,
-    transactions: (transactionsQ.data ?? mockTransactions).slice(0, 10), // only recent transactions on dashboard
+    ticketData: metrics.weekly_distribution ?? [],
+    monthlyData: metrics.monthly_data ?? [],
+    pieData: metrics.visitor_categories ?? [],
+    voyages: voyagesQ.data ?? [],
+    transactions: (transactionsQ.data ?? []).slice(0, 10), // only recent transactions on dashboard
     overview: metrics.overview || {},
   };
 

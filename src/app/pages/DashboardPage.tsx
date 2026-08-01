@@ -1,6 +1,6 @@
 import React from "react";
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar, Cell, AreaChart, Area, PieChart as RPieChart, Pie, Legend } from "recharts";
-import { KPICard, ChartCard, PageHeader, Btn, Table, Card, OccBar , Loader } from "@/app/components/ui/Shared";
+import { KPICard, ChartCard, PageHeader, Btn, Table, Card, OccBar , Loader, EmptyState } from "@/app/components/ui/Shared";
 import { Badge, StatusBadge, cn, C } from "@/app/components/layout/common";
 import { RefreshCw, FileText, Ticket, Banknote, Ship, Users, Scan, Wallet as WalletIcon, FileCheck, BarChart3 } from "lucide-react";
 import { motion } from "motion/react";
@@ -129,6 +129,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
           <ChartCard title="Billets vendus — 7 derniers jours">
+            {ticketData.length === 0 ? <EmptyState className="h-[210px]" /> : (
             <ResponsiveContainer width="100%" height={210}>
               <BarChart data={ticketData}>
                 <CartesianGrid key="cg" strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -140,9 +141,11 @@ export default function DashboardPage() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+            )}
           </ChartCard>
         </div>
         <ChartCard title="Passagers par catégorie" subtitle="Ce mois">
+          {pieData.length === 0 ? <EmptyState className="h-[240px]" /> : (
           <ResponsiveContainer width="100%" height={240}>
             <RPieChart>
               <Pie key="pie" data={pieData} cx="50%" cy="44%" innerRadius={48} outerRadius={78} paddingAngle={3} dataKey="value">
@@ -152,6 +155,7 @@ export default function DashboardPage() {
               <Legend key="lg" verticalAlign="bottom" iconSize={10} wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
             </RPieChart>
           </ResponsiveContainer>
+          )}
         </ChartCard>
       </div>
 
@@ -160,11 +164,13 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold text-slate-900">Voyages du jour — {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</h3>
         </div>
         <Table
+          emptyMessage="Aucun voyage pour aujourd'hui"
           cols={["ID", "Départ", "Arrivée", "Chaloupe", "Places", "Vendus", "Occupation", "Statut", "Recette"]}
           rows={voyages.map(v => [
-            <span className="font-mono text-xs text-slate-500">{v.id}</span>,
-            <span className="font-mono font-bold text-slate-900">{v.depart}</span>,
-            v.arrivee, v.chaloupe,
+            // UUID complet illisible dans une colonne : on montre le préfixe.
+            <span className="font-mono text-xs text-slate-500" title={v.id}>{String(v.id).slice(0, 8)}</span>,
+            <span className="font-mono font-bold text-slate-900">{v.heure_depart || "—"}</span>,
+            <span className="font-mono">{v.heure_arrivee || "—"}</span>, v.chaloupe,
             <span className="font-mono">{v.places}</span>,
             <span className="font-mono">{v.vendus}</span>,
             <OccBar val={v.vendus === 0 ? 0 : Math.round((v.vendus / v.places) * 100)} />,
@@ -176,6 +182,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 gap-4">
         <ChartCard title="Recettes mensuelles 2026" subtitle="En millions FCFA">
+          {monthlyData.length === 0 ? <EmptyState className="h-[160px]" /> : (
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={monthlyData}>
               <defs>
@@ -191,10 +198,12 @@ export default function DashboardPage() {
               <Area key="area" type="monotone" dataKey="recettes" stroke={C.ocean} fill="url(#gradDash)" strokeWidth={2.5} name="Recettes" />
             </AreaChart>
           </ResponsiveContainer>
+          )}
         </ChartCard>
         <Card>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">Dernières transactions</h3>
           <div className="space-y-2">
+            {transactions.length === 0 && <EmptyState message="Aucune transaction récente" />}
             {transactions.slice(0, 5).map((t, i) => (
               <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-50 dark:border-slate-700">
                 <div className="flex items-center gap-2">
