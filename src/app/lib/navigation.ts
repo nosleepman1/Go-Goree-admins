@@ -63,6 +63,5 @@ export const NAV: NavItem[] = [
   ]},
   { id: "params", label: "Paramètres", icon: undefined, children: [
     { label: "Général", page: "params-general" },
-    { label: "Sécurité", page: "params-securite" },
   ]},
 ];

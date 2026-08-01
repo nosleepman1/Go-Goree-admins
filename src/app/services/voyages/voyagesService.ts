@@ -45,6 +45,7 @@ function mapVoyage(backendVoyage: any): Voyage {
     date_voyage: backendVoyage.date_voyage,
     heure_depart: heureDepart,
     heure_arrivee: heureDepart && !Number.isNaN(duree) ? ajouterMinutes(heureDepart, duree) : "",
+    jour: trajet.jour,
   };
 }
 

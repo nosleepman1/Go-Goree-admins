@@ -47,7 +47,6 @@ export const PAGE_TO_PATH: Record<string, string> = {
   "rapp-csv": "/rapports/csv",
   "rapp-historique": "/rapports/historique",
   "params-general": "/parametres",
-  "params-securite": "/parametres/securite",
 };
 
 export function pathForPage(page: string): string {

@@ -116,10 +116,7 @@ export default function NotifsPage({ sub }: { sub: string }) {
                     ))}
                   </select>
                 </div>
-                <button type="submit" disabled={broadcastMutation.isPending}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 shadow transition-colors">
-                  <Send size={13} /> Diffuser la notification
-                </button>
+                <Btn type="submit" label="Diffuser la notification" icon={Send} variant="primary" loading={broadcastMutation.isPending} />
               </div>
             </form>
           </Card>

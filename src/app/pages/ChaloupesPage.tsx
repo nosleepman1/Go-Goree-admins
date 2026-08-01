@@ -141,9 +141,13 @@ export default function ChaloupesPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
-                <CheckCircle size={13} /> Enregistrer
-              </button>
+              <Btn
+                type="submit"
+                label="Enregistrer"
+                icon={CheckCircle}
+                variant="primary"
+                loading={editId ? updateMutation.isPending : createMutation.isPending}
+              />
               <button type="button" className="px-3 py-1.5 border rounded-lg text-xs" onClick={handleCloseForm}>Annuler</button>
             </div>
           </form>

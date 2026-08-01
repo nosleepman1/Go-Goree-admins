@@ -92,8 +92,7 @@ export default function AppRoutes({ darkMode, onDark }: { darkMode: boolean; onD
         <Route path="/rapports/historique" element={<RapportsPage sub="historique" />} />
 
         {/* Paramètres */}
-        <Route path="/parametres" element={<ParamsPage sub="general" />} />
-        <Route path="/parametres/securite" element={<ParamsPage sub="securite" />} />
+        <Route path="/parametres" element={<ParamsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
