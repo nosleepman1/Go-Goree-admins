@@ -34,8 +34,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 const C = {
-  ocean:        "#1035A8",
-  sidebarActive:"linear-gradient(135deg, #1035A8, #0BA5C0)",
+  ocean:        "#0B5ED7",
+  sidebarActive:"linear-gradient(135deg, #4EA8DE, #0B5ED7)",
   sidebarBorder:"#C2D3EE",
 };
 

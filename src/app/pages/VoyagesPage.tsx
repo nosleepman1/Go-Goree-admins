@@ -71,7 +71,11 @@ export default function VoyagesPage({ sub }: { sub?: string }) {
     // Un même horaire (heure_depart) peut exister sur plusieurs jours : il faut
     // matcher sur (jour + heure_depart), sinon on risque de réaffecter le voyage
     // au trajet d'un autre jour lors de l'enregistrement.
-    const matchingTrajet = trajets.find(t => t.jour === v.jour && t.heure_depart?.startsWith(v.heure_depart));
+    // `v.heure_depart` peut être vide si le trajet n'a pas d'horaire : sans ce
+    // garde-fou, startsWith("") matcherait n'importe quel trajet du même jour.
+    const matchingTrajet = v.heure_depart
+      ? trajets.find(t => t.jour === v.jour && t.heure_depart?.startsWith(v.heure_depart))
+      : undefined;
     if (matchingTrajet) {
       setTrajetId(matchingTrajet.id);
     } else if (trajets.length > 0) {
