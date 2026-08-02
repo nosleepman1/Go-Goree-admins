@@ -30,6 +30,10 @@ export function getEcho(): Echo {
     auth: {
       headers: {
         Authorization: `Bearer ${useAuthStore.getState().token}`,
+        // Même raison que dans laravelClient : si l'API est jointe via un
+        // tunnel ngrok, sa page d'avertissement répondrait à la place de
+        // Laravel et l'authentification du canal privé échouerait.
+        "ngrok-skip-browser-warning": "true",
       },
     },
   });

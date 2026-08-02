@@ -7,7 +7,14 @@ export function setTokenGetter(fn: () => string | null) {
 
 export const laravelClient = axios.create({
   baseURL: import.meta.env.VITE_API_LARAVEL_URL ?? "http://localhost:8000/api",
-  headers: { Accept: "application/json" },
+  headers: {
+    Accept: "application/json",
+    // Sans effet hors ngrok. Derrière un tunnel gratuit, évite la page
+    // d'avertissement interstitielle : ngrok répond alors à la place de
+    // Laravel, sans en-tête CORS, et le navigateur signale une erreur CORS
+    // trompeuse (ERR_NGROK_6024) alors que la configuration est correcte.
+    "ngrok-skip-browser-warning": "true",
+  },
 });
 
 laravelClient.interceptors.request.use((config) => {
