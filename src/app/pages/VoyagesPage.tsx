@@ -12,7 +12,19 @@ import {
 } from "@/app/hooks/voyages/useVoyages";
 import { useChaloupes } from "@/app/hooks/chaloupes/useChaloupes";
 import { useTrajets } from "@/app/hooks/trajets/useTrajets";
+import { useQuery } from "@tanstack/react-query";
+import { getDashboardMetrics } from "@/app/services/analytics/analyticsService";
+import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from "recharts";
 import { toast } from "sonner";
+
+/** Valeur affichée tant que l'API n'a rien fourni — jamais un chiffre inventé. */
+const ND = "—";
+
+/** 2 820 000 -> « 2,8 M FCFA ». */
+function formatMillionsFcfa(montant: number): string {
+  if (montant >= 1_000_000) return `${(montant / 1_000_000).toFixed(1).replace(".", ",")} M FCFA`;
+  return `${montant.toLocaleString("fr-FR")} FCFA`;
+}
 
 export default function VoyagesPage({ sub }: { sub?: string }) {
   const { confirmAction, ConfirmModal } = useConfirm();
@@ -21,6 +33,15 @@ export default function VoyagesPage({ sub }: { sub?: string }) {
   const { data: voyages = [], isLoading: vLoading, isError: vError } = useVoyages();
   const { data: chaloupes = [], isLoading: cLoading, isError: cError } = useChaloupes();
   const { data: trajets = [], isLoading: tLoading, isError: tError } = useTrajets();
+
+  // Récapitulatif de la page Historique : calculé par l'API, jamais deviné ici.
+  const { data: metrics } = useQuery({
+    queryKey: ["dashboard", "analytics"],
+    queryFn: getDashboardMetrics,
+    staleTime: 60000,
+  });
+  const histo = metrics?.historique_voyages ?? null;
+  const monthly = metrics?.monthly_data ?? [];
 
   const createMutation = useCreateVoyage();
   const updateMutation = useUpdateVoyage();
@@ -246,8 +267,10 @@ export default function VoyagesPage({ sub }: { sub?: string }) {
         <Loader isLoading={vLoading} isError={vError} />
         <div className="grid grid-cols-4 gap-4 mb-6">
           {[
-            ["Total voyages", "1 247", "#1035A8"], ["Passagers transportés", "563 480", "#0BA5C0"],
-            ["Recettes totales", "2,82 Millions FCFA", "#0E9F6E"], ["Taux d'occupation moyen", "85.4%", "#D97706"],
+            ["Total voyages", histo ? histo.total_voyages.toLocaleString("fr-FR") : ND, "#1035A8"],
+            ["Passagers transportés", histo ? histo.passagers_transportes.toLocaleString("fr-FR") : ND, "#0BA5C0"],
+            ["Recettes totales", histo ? formatMillionsFcfa(histo.recettes_totales) : ND, "#0E9F6E"],
+            ["Taux d'occupation moyen", histo ? `${histo.taux_occupation_moyen}%` : ND, "#D97706"],
           ].map(([l, v, c]) => (
             <Card key={l as string} className="text-center py-5">
               <div className="text-xl font-bold font-mono mb-1" style={{ color: c as string }}>{v as string}</div>
@@ -256,14 +279,23 @@ export default function VoyagesPage({ sub }: { sub?: string }) {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <ChartCard title="Évolution mensuelle des billets" subtitle="2026 — par mois animate">
-            <div className="h-48 flex items-center justify-center text-sm text-slate-400">Flux de passagers stable Dakar ↔ Gorée</div>
-          </ChartCard>
-          <ChartCard title="Taux d'occupation mensuel" subtitle="%">
-            <div className="h-48 flex items-center justify-center text-sm text-slate-400">Occupation moyenne stable (85.4%)</div>
-          </ChartCard>
-        </div>
+        <ChartCard title="Billets vendus par mois" subtitle="Année en cours">
+          {monthly.length === 0 ? (
+            <div className="h-48 flex items-center justify-center text-sm text-slate-400">
+              Aucune donnée à afficher
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={monthly}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+                <Bar dataKey="billets" fill="#1035A8" radius={[3, 3, 0, 0]} name="Billets" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </ChartCard>
       </div>
     );
   }

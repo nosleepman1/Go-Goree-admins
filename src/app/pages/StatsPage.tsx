@@ -22,6 +22,8 @@ export default function StatsPage({ sub }: { sub: string }) {
   const paiementData = metrics?.payment_methods ?? [];
   const hourlyData = metrics?.hourly_boardings ?? [];
   const chaloupesData = metrics?.chaloupes_occupations ?? [];
+  const validation = metrics?.validation_qr ?? null;
+  const controleurs = validation?.par_controleur ?? [];
 
   const feedback = <Loader isLoading={isLoading} isError={isError} />;
 
@@ -209,23 +211,43 @@ export default function StatsPage({ sub }: { sub: string }) {
       <div className="p-6">
         {feedback}
         <PageHeader title="Taux de validation QR" subtitle="Analyse mensuelle par mois" />
-        {/*
-          Aucune de ces métriques n'est exposée par l'API : /analytics/dashboard
-          ne renvoie que `qr_valides_aujourdhui` (le jour, pas le mois) et aucune
-          ventilation par contrôleur. Les valeurs restent donc à « — » en
-          attendant un endpoint dédié — voir README.
-        */}
         <div className="grid grid-cols-4 gap-4 mb-6">
-          {[ ["QR scannés (mois)", C.ocean], ["Valides", C.green], ["Invalides", C.red], ["Taux global", C.teal] ].map(([l, c]) => (
+          {[
+            ["QR scannés (mois)", validation ? validation.scannes_mois.toLocaleString("fr-FR") : ND, C.ocean],
+            ["Valides", validation ? validation.valides.toLocaleString("fr-FR") : ND, C.green],
+            ["Invalides", validation ? validation.invalides.toLocaleString("fr-FR") : ND, C.red],
+            ["Taux global", validation ? `${validation.taux_global}%` : ND, C.teal],
+          ].map(([l, v, c]) => (
             <Card key={l as string} className="text-center py-4">
-              <div className="text-xl font-bold font-mono" style={{ color: c as string }}>{ND}</div>
+              <div className="text-xl font-bold font-mono" style={{ color: c as string }}>{v as string}</div>
               <div className="text-xs text-slate-500 mt-1">{l as string}</div>
             </Card>
           ))}
         </div>
         <Card>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Taux de validation par contrôleur</h3>
-          <EmptyState message="Métrique non disponible — endpoint à implémenter côté API" />
+          <div className="space-y-3">
+            {controleurs.length === 0 ? (
+              <EmptyState message="Aucun scan enregistré ce mois-ci" />
+            ) : (
+              controleurs.map((agent: any) => (
+                <div key={agent.id}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="font-semibold text-slate-700">{agent.nom}</span>
+                    <span className="font-mono text-slate-600">
+                      {agent.taux}% · {agent.scannes} scans
+                    </span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${agent.taux}%`, background: `linear-gradient(90deg, ${C.ocean}, ${C.teal})` }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </Card>
       </div>
     );
