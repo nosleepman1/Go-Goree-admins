@@ -112,7 +112,7 @@ export default function RapportsPage({ sub }: { sub: string }) {
                   </label>
                 ))}
               </div>
-              <Btn label="Générer le rapport" icon={FileText} variant="primary" type="submit" />
+              <Btn label="Générer le rapport" icon={FileText} variant="primary" type="submit" loading={generateMutation.isPending} />
             </form>
           </Card>
           

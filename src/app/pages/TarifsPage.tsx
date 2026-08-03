@@ -147,8 +147,7 @@ export default function TarifsPage({ sub }: { sub: string }) {
                 </div>
               </div>
               <div className="flex gap-2">
-                {/**Add loader on submit button */}
-                <button type="submit" className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold">Ajouter</button>
+                <Btn type="submit" label="Ajouter" variant="primary" loading={createTarifMutation.isPending} />
                 <button type="button" className="px-3 py-1.5 border rounded-lg text-xs" onClick={() => setShowAddTarif(false)}>Annuler</button>
               </div>
             </form>
@@ -209,7 +208,7 @@ export default function TarifsPage({ sub }: { sub: string }) {
                 </div>
               </div>
               <div className="flex gap-2">
-                <button type="submit" className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold">Enregistrer</button>
+                <Btn type="submit" label="Enregistrer" variant="primary" loading={createTrajetMutation.isPending} />
                 <button type="button" className="px-3 py-1.5 border rounded-lg text-xs" onClick={() => setShowAddTrajet(false)}>Annuler</button>
               </div>
             </form>
@@ -278,7 +277,7 @@ export default function TarifsPage({ sub }: { sub: string }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold">Ajouter</button>
+              <Btn type="submit" label="Ajouter" variant="primary" loading={createTarifMutation.isPending} />
               <button type="button" className="px-3 py-1.5 border rounded-lg text-xs" onClick={() => setShowAddTarif(false)}>Annuler</button>
             </div>
           </form>

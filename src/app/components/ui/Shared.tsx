@@ -72,7 +72,7 @@ export function Btn({ label, icon: Icon, variant = "primary", onClick, loading, 
       type={type}
       disabled={loading || disabled}
       className={cn(base, vars[variant], (loading || disabled) && "opacity-70 cursor-not-allowed", className)}
-      style={variant === "primary" ? { background: "linear-gradient(135deg, #1A56DB, #0BA5C0)" } as React.CSSProperties : undefined}
+      style={variant === "primary" ? { background: "linear-gradient(135deg, #4EA8DE, #0B5ED7)" } as React.CSSProperties : undefined}
       onClick={onClick}
     >
       {loading ? (
@@ -88,7 +88,20 @@ export function Btn({ label, icon: Icon, variant = "primary", onClick, loading, 
   );
 }
 
-export function Table({ cols, rows }: { cols: string[]; rows: (string | React.ReactNode)[][] }) {
+/**
+ * État vide — affiché quand l'API ne renvoie aucune donnée. On préfère un vide
+ * explicite à des chiffres de démonstration : un tableau de bord qui invente
+ * des valeurs est plus dangereux qu'un tableau de bord vide.
+ */
+export function EmptyState({ message = "Aucune donnée à afficher", className }: { message?: string; className?: string }) {
+  return (
+    <div className={cn("flex items-center justify-center py-10 text-sm text-slate-400 dark:text-slate-500", className)}>
+      {message}
+    </div>
+  );
+}
+
+export function Table({ cols, rows, emptyMessage }: { cols: string[]; rows: (string | React.ReactNode)[][]; emptyMessage?: string }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -100,6 +113,13 @@ export function Table({ cols, rows }: { cols: string[]; rows: (string | React.Re
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 && (
+            <tr>
+              <td colSpan={cols.length} className="py-10 text-center text-sm text-slate-400 dark:text-slate-500">
+                {emptyMessage ?? "Aucune donnée à afficher"}
+              </td>
+            </tr>
+          )}
           {rows.map((row, i) => (
             <tr key={i} className="border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50/60 dark:hover:bg-slate-700/30 transition-colors">
               {row.map((cell, j) => (
@@ -139,7 +159,7 @@ export function OccBar({ val }: { val: number }) {
   return (
     <div className="flex items-center gap-2 min-w-[80px]">
       <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div className="h-full rounded-full" style={{ width: `${val}%`, background: `linear-gradient(90deg, #1035A8, #0BA5C0)` }} />
+        <div className="h-full rounded-full" style={{ width: `${val}%`, background: `linear-gradient(90deg, #4EA8DE, #0B5ED7)` }} />
       </div>
       <span className="text-xs font-mono text-slate-600 w-8 text-right">{val}%</span>
     </div>
@@ -162,8 +182,8 @@ export function Loader({ isLoading, isError, message }: { isLoading?: boolean; i
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="size-4 rounded-full shadow-[0_0_15px_rgba(11,165,192,0.6)]"
-                style={{ background: "linear-gradient(135deg, #1035A8, #0BA5C0)" }}
+                className="size-4 rounded-full shadow-[0_0_15px_rgba(11,94,215,0.6)]"
+                style={{ background: "linear-gradient(135deg, #4EA8DE, #0B5ED7)" }}
                 animate={{
                   y: ["0%", "-120%", "0%"],
                   scale: [1, 1.4, 1],
@@ -181,7 +201,7 @@ export function Loader({ isLoading, isError, message }: { isLoading?: boolean; i
           <motion.div 
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="text-xs font-bold uppercase tracking-[0.25em] bg-clip-text text-transparent bg-gradient-to-r from-[#1035A8] to-[#0BA5C0]"
+            className="text-xs font-bold uppercase tracking-[0.25em] bg-clip-text text-transparent bg-gradient-to-r from-[#4EA8DE] to-[#0B5ED7]"
           >
             {message || "Chargement des données..."}
           </motion.div>

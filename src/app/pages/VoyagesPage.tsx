@@ -68,7 +68,14 @@ export default function VoyagesPage({ sub }: { sub?: string }) {
     const matchingChaloupe = chaloupes.find(c => c.nom === v.chaloupe);
     if (matchingChaloupe) setChaloupeId(matchingChaloupe.id);
     
-    const matchingTrajet = trajets.find(t => t.heure_depart?.startsWith(v.heure_depart));
+    // Un même horaire (heure_depart) peut exister sur plusieurs jours : il faut
+    // matcher sur (jour + heure_depart), sinon on risque de réaffecter le voyage
+    // au trajet d'un autre jour lors de l'enregistrement.
+    // `v.heure_depart` peut être vide si le trajet n'a pas d'horaire : sans ce
+    // garde-fou, startsWith("") matcherait n'importe quel trajet du même jour.
+    const matchingTrajet = v.heure_depart
+      ? trajets.find(t => t.jour === v.jour && t.heure_depart?.startsWith(v.heure_depart))
+      : undefined;
     if (matchingTrajet) {
       setTrajetId(matchingTrajet.id);
     } else if (trajets.length > 0) {
@@ -276,10 +283,7 @@ export default function VoyagesPage({ sub }: { sub?: string }) {
             La tâche automatique (`GenererVoyagesSemaineJob`) s'exécute chaque jour à 22h00 pour générer les voyages des 7 prochains jours basés sur la grille horaire des trajets.
           </p>
         </div>
-        <button onClick={handleTriggerGeneration} disabled={genererMutation.isPending}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 shadow transition-all duration-200 disabled:opacity-50">
-          Déclencher la génération manuelle
-        </button>
+        <Btn label="Déclencher la génération manuelle" variant="primary" onClick={handleTriggerGeneration} loading={genererMutation.isPending} />
       </Card>
 
       <PageHeader title="Voyages" subtitle={`Gestion des voyages planifiés et des affectations`}
@@ -315,9 +319,13 @@ export default function VoyagesPage({ sub }: { sub?: string }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
-                <CheckCircle size={13} /> Enregistrer
-              </button>
+              <Btn
+                type="submit"
+                label="Enregistrer"
+                icon={CheckCircle}
+                variant="primary"
+                loading={editId ? updateMutation.isPending : createMutation.isPending}
+              />
               <button type="button" className="px-3 py-1.5 border rounded-lg text-xs" onClick={handleCloseForm}>Annuler</button>
             </div>
           </form>

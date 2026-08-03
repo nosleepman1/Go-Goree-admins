@@ -5,7 +5,9 @@ import type { Voyage } from "../../types/voyages";
 export function useVoyages() {
   return useQuery({
     queryKey: ["voyages"],
-    queryFn: listVoyages,
+    // Encapsulé : React Query passe son contexte en 1er argument, qui serait
+    // pris pour le filtre `periode` de listVoyages.
+    queryFn: () => listVoyages(),
     staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 }
