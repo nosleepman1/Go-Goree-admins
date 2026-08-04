@@ -9,10 +9,3 @@ export async function generateRapport(payload: { type: string; mois: string; for
   const response = await laravelClient.post("/v1/rapports", payload);
   return response.data;
 }
-
-export function getDownloadUrl(id: string): string {
-  // Returns download endpoint URL with authorization token or direct path
-  const baseURL = laravelClient.defaults.baseURL || "";
-  const token = localStorage.getItem("gg_admin_token") || "";
-  return `${baseURL}/v1/rapports/${id}/telecharger?token=${token}`;
-}

@@ -34,8 +34,14 @@ export const useAuthStore = create<AuthState>()(
         });
         
         const { access_token, user } = response.data;
-        const normalizedRole = user.role?.nom === "Admin" ? "admin" : "agent";
-        
+
+        // Ce panel n'est ouvert qu'aux administrateurs : le rôle Agent n'a de
+        // toute façon accès à presque aucune route côté backend (routes/api/v1/*.php).
+        if (user.role?.nom !== "Admin") {
+          throw new Error("ACCESS_DENIED");
+        }
+        const normalizedRole = "admin";
+
         set({
           token: access_token,
           user: {

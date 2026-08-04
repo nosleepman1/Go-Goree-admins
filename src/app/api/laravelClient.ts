@@ -4,6 +4,9 @@ let tokenGetter: () => string | null = () => localStorage.getItem("gg_token");
 export function setTokenGetter(fn: () => string | null) {
   tokenGetter = fn;
 }
+export function getAuthToken(): string | null {
+  return tokenGetter();
+}
 
 export const laravelClient = axios.create({
   baseURL: import.meta.env.VITE_API_LARAVEL_URL ?? "http://localhost:8000/api",
